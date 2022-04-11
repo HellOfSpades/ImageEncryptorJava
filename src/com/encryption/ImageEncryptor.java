@@ -20,13 +20,9 @@ public abstract class ImageEncryptor {
         return image;
     }
 
-    public void encryptString(String string) throws TooManyBitsException {
-        encryptBytes(string.getBytes());
-    }
+    public void encryptString(String string) throws TooManyBitsException {encryptBytes(string.getBytes());}
 
-    public void encryptBytes(byte[] bytes) throws TooManyBitsException {
-        encryptBits(BitByteAdaptor.byteArrayToBitArray(bytes));
-    }
+    public void encryptBytes(byte[] bytes) throws TooManyBitsException {encryptBits(BitByteAdaptor.byteArrayToBitArray(bytes));}
 
     abstract public void encryptBits(boolean[] bits) throws TooManyBitsException;
 
