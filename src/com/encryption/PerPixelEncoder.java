@@ -1,18 +1,14 @@
 package com.encryption;
 
-import com.encryption.adaptors.BitByteAdaptor;
-
-import javax.swing.text.html.HTMLDocument;
 import java.awt.image.BufferedImage;
-import java.util.Iterator;
 
 /**
  * author: HellOfSpades
  * encrypts a message so that one pixel corresponds to one bit
  */
-public class PerPixelEncryptor extends ImageEncryptor {
+public class PerPixelEncoder extends ImageEncoder {
 
-    public PerPixelEncryptor(BufferedImage image) {
+    public PerPixelEncoder(BufferedImage image) {
         super(image);
     }
 

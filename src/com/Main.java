@@ -1,8 +1,7 @@
 package com;
 
-import com.encryption.ImageEncryptor;
-import com.encryption.PerColourEncryptor;
-import com.encryption.PerPixelEncryptor;
+import com.encryption.ImageEncoder;
+import com.encryption.PerColourEncoder;
 import com.encryption.TooManyBitsException;
 
 import javax.imageio.ImageIO;
@@ -16,7 +15,7 @@ public class Main {
 
         BufferedImage baseImage = ImageIO.read(new File(Constants.INPUT_FILE_PATH));
 
-        ImageEncryptor encryptor = new PerColourEncryptor(baseImage);
+        ImageEncoder encryptor = new PerColourEncoder(baseImage);
         System.out.println(encryptor.getBitCapacity());
 
         try {
@@ -27,7 +26,7 @@ public class Main {
         }
 
         BufferedImage codedImage = ImageIO.read(new File(Constants.OUTPUT_FILE_PATH));
-        ImageEncryptor decryptor = new PerColourEncryptor(codedImage);
+        ImageEncoder decryptor = new PerColourEncoder(codedImage);
         System.out.println(decryptor.decryptToString());
 
     }

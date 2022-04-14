@@ -8,11 +8,11 @@ import java.awt.image.BufferedImage;
  * author: HellOfSpades
  * base interface for an imageEncryptor
  */
-public abstract class ImageEncryptor {
+public abstract class ImageEncoder {
 
     private BufferedImage image;
 
-    ImageEncryptor(BufferedImage image){
+    ImageEncoder(BufferedImage image){
         this.image = image;
     }
 

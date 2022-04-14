@@ -3,9 +3,9 @@ package com.encryption;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 
-public class PerColourEncryptor extends ImageEncryptor{
+public class PerColourEncoder extends ImageEncoder {
 
-    public PerColourEncryptor(BufferedImage image) {
+    public PerColourEncoder(BufferedImage image) {
         super(image);
     }
 
