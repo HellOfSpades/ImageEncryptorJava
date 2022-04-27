@@ -1,4 +1,4 @@
-package com.encryption;
+package com.encryption.image_encoder;
 
 import com.encryption.adaptors.BitByteAdaptor;
 

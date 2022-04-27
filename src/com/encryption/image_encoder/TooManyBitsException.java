@@ -1,4 +1,4 @@
-package com.encryption;
+package com.encryption.image_encoder;
 
 public class TooManyBitsException extends Exception{
     public TooManyBitsException() {
