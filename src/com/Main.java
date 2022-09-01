@@ -21,19 +21,24 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
+        try {
+            BufferedImage baseImage = ImageIO.read(new File(Constants.INPUT_FILE_PATH));
 
-        BufferedImage baseImage = ImageIO.read(new File(Constants.INPUT_FILE_PATH));
+            PPKeyImageEncryptor imageEncryptor = new PPKeyImageEncryptor(2048);
+            System.out.println("symbol capacity: " + imageEncryptor.getSymbolCapacity(baseImage));
 
-        PPKeyImageEncryptor imageEncryptor = new PPKeyImageEncryptor(2048);
-        BufferedImage encryptedImage = imageEncryptor.encrypt(Constants.MESSAGE.getBytes(), baseImage);
+            BufferedImage encryptedImage = imageEncryptor.encrypt(Constants.MESSAGE.getBytes(), baseImage);
 
-        //decryption part
-        ImageEncryptor imageEncryptor1 = new PPKeyImageEncryptor
-                (imageEncryptor.getModulus()
-                        , imageEncryptor.getPublicExponent()
-                        ,imageEncryptor.getPrivateExponent());
+            //decryption part
+            ImageEncryptor imageEncryptor1 = new PPKeyImageEncryptor
+                    (imageEncryptor.getModulus()
+                            , imageEncryptor.getPublicExponent()
+                            , imageEncryptor.getPrivateExponent());
 
-        byte[] decryptedMessage = imageEncryptor1.decrypt(encryptedImage);
-        System.out.println(new String(decryptedMessage));
+            byte[] decryptedMessage = imageEncryptor1.decrypt(encryptedImage);
+            System.out.println(new String(decryptedMessage));
+        }catch (TooManyBitsException e){
+            e.printStackTrace();
+        }
     }
 }

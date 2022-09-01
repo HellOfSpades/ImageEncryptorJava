@@ -65,12 +65,16 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
     }
 
     @Override
-    public BufferedImage encrypt(byte[] message, BufferedImage image) {
+    public BufferedImage encrypt(byte[] message, BufferedImage image) throws TooManyBitsException {
+        ImageEncoder encoder = createImageEncoder(image);
+        if(message.length>getSymbolCapacity(encoder))throw new TooManyBitsException();
 
         try{
             AesEncryptor aesEncryptor = new AesEncryptor();
             //the message encrypted with the AES algorithm
             byte[] encryptedMessage = aesEncryptor.encrypt(message);
+            System.out.println(message.length);
+            System.out.println(encryptedMessage.length);
             byte[] messageLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(encryptedMessage.length).array();
 
             byte[] aesParameters = aesEncryptor.getParameters();
@@ -100,7 +104,6 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
                 combinedMessage[i+encryptedAesParameters.length] = encryptedMessage[i];
             }
 
-            ImageEncoder encoder = new PerColourEncoder(image);
             encoder.encryptBytes(combinedMessage);
             return encoder.getImage();
 
@@ -115,8 +118,6 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
             e.printStackTrace();
         } catch (BadPaddingException e) {
             e.printStackTrace();
-        } catch (TooManyBitsException e) {
-            e.printStackTrace();
         }
 
         return null;
@@ -126,7 +127,7 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
     public byte[] decrypt(BufferedImage image) {
         if(privateKey==null)throw new UnsupportedOperationException();
         try {
-            ImageEncoder imageEncoder = new PerColourEncoder(image);
+            ImageEncoder imageEncoder = createImageEncoder(image);
             byte[] decodedMessage = imageEncoder.decryptToBytes();
 
             byte[] encryptedAesParametersAndMessageLength = new byte[publicKey.getModulus().toByteArray().length-1];
@@ -190,6 +191,41 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
         return publicKey.getModulus();
     }
 
+    /**
+     *
+     * @param image
+     * @return returns the maximum number of symbols that can be encoded in the given image
+     */
+    @Override
+    public int getSymbolCapacity(BufferedImage image){
+        ImageEncoder imageEncoder = createImageEncoder(image);
+        return getSymbolCapacity(imageEncoder);
+    }
+
+    /**
+     *
+     * @param imageEncoder
+     * @return returns the symbol capacity based on the ImageEncoder
+     */
+    private int getSymbolCapacity(ImageEncoder imageEncoder){
+        int byteCopacity = imageEncoder.getBitCapacity()/8;
+        //subtract the space needed for the encrypted AES key and message length
+        byteCopacity-=publicKey.getModulus().toByteArray().length;
+        //AES Encryption has an output length in multiples of 16, so we round down
+        byteCopacity/=16;
+        byteCopacity*=16;
+
+        return byteCopacity;
+    }
+
+    /**
+     *
+     * @param image
+     * @return an ImageEncoder that was created using the image
+     */
+    private ImageEncoder createImageEncoder(BufferedImage image){
+        return new PerColourEncoder(image);
+    }
 
     /**
      * This class is used to code the message itself
