@@ -9,9 +9,15 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.*;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,28 +25,43 @@ import java.util.List;
 
 public class PPKeyImageEncryptor implements ImageEncryptor{
 
-    PrivateKey privateKey;
-    PublicKey publicKey;
+    RSAPrivateKey privateKey;
+    RSAPublicKey publicKey;
 
-    public PPKeyImageEncryptor() {
+    public PPKeyImageEncryptor(int keySize) {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(8192, new SecureRandom());
+            keyPairGenerator.initialize(keySize, new SecureRandom());
             KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            this.privateKey = keyPair.getPrivate();
-            this.publicKey = keyPair.getPublic();
+            this.privateKey = (RSAPrivateKey) keyPair.getPrivate();
+            this.publicKey = (RSAPublicKey) keyPair.getPublic();
+
         }catch (NoSuchAlgorithmException e){
             e.printStackTrace();
         }
     }
 
-    public PPKeyImageEncryptor(PublicKey publicKey) {
-        this.publicKey = publicKey;
+    public PPKeyImageEncryptor(BigInteger modulus, BigInteger publicExponent) {
+        try {
+            KeyFactory factory = KeyFactory.getInstance("RSA");
+            this.publicKey = (RSAPublicKey) factory.generatePublic(new RSAPublicKeySpec(modulus,publicExponent));
+        }catch (NoSuchAlgorithmException e){
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
     }
 
-    public PPKeyImageEncryptor(PrivateKey privateKey, PublicKey publicKey) {
-        this.privateKey = privateKey;
-        this.publicKey = publicKey;
+    public PPKeyImageEncryptor(BigInteger modulus, BigInteger publicExponent, BigInteger privateExponent) {
+        try {
+            KeyFactory factory = KeyFactory.getInstance("RSA");
+            this.publicKey = (RSAPublicKey) factory.generatePublic(new RSAPublicKeySpec(modulus,publicExponent));
+            this.privateKey = (RSAPrivateKey) factory.generatePrivate(new RSAPrivateKeySpec(modulus,privateExponent));
+        }catch (NoSuchAlgorithmException e){
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -54,6 +75,7 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
 
             byte[] aesParameters = aesEncryptor.getParameters();
 
+            //putting the message length and aes parameters into a single byte array so they can be encoded together
             byte[] encodedWithRsa = new byte[aesParameters.length+messageLength.length];
             for (int i = 0; i < aesParameters.length; i++) {
                 encodedWithRsa[i] = aesParameters[i];
@@ -67,13 +89,11 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
             rsaCipher.init(Cipher.ENCRYPT_MODE, this.publicKey);
             //encrypted AES cipher parameters with the RSA algorithm
             byte[] encryptedAesParameters = rsaCipher.doFinal(encodedWithRsa);
-
             //combined message that will be encoded into the image
             //first comes the encrypted AES parameters (48 bytes)
             //then comes the encrypted message
             byte[] combinedMessage = new byte[encryptedMessage.length+encryptedAesParameters.length];
             for (int i = 0; i < encryptedAesParameters.length; i++) {
-                System.out.println(i+" "+encryptedAesParameters[i]);
                 combinedMessage[i] = encryptedAesParameters[i];
             }
             for (int i = 0; i < encryptedMessage.length; i++) {
@@ -109,17 +129,17 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
             ImageEncoder imageEncoder = new PerColourEncoder(image);
             byte[] decodedMessage = imageEncoder.decryptToBytes();
 
-            byte[] encryptedAesParametersAndMessageLength = new byte[1024];
+            byte[] encryptedAesParametersAndMessageLength = new byte[publicKey.getModulus().toByteArray().length-1];
 
 
             for (int i = 0; i < encryptedAesParametersAndMessageLength.length; i++) {
                 encryptedAesParametersAndMessageLength[i] = decodedMessage[i];
-                System.out.println(i+" "+encryptedAesParametersAndMessageLength[i]);
             }
 
 
             Cipher rsaCipher = Cipher.getInstance("RSA");
             rsaCipher.init(Cipher.DECRYPT_MODE, this.privateKey);
+
 
             byte[] rsaDecoded = rsaCipher.doFinal(encryptedAesParametersAndMessageLength);
 
@@ -158,12 +178,16 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
         return null;
     }
 
-    public PrivateKey getPrivateKey() {
-        return privateKey;
+    public BigInteger getPrivateExponent() {
+        return (privateKey!=null)?privateKey.getPrivateExponent():null;
     }
 
-    public PublicKey getPublicKey() {
-        return publicKey;
+    public BigInteger getPublicExponent() {
+        return publicKey.getPublicExponent();
+    }
+
+    public BigInteger getModulus(){
+        return publicKey.getModulus();
     }
 
 
