@@ -73,8 +73,6 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
             AesEncryptor aesEncryptor = new AesEncryptor();
             //the message encrypted with the AES algorithm
             byte[] encryptedMessage = aesEncryptor.encrypt(message);
-            System.out.println(message.length);
-            System.out.println(encryptedMessage.length);
             byte[] messageLength = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(encryptedMessage.length).array();
 
             byte[] aesParameters = aesEncryptor.getParameters();
@@ -87,7 +85,6 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
             for (int i = 0; i < messageLength.length; i++) {
                 encodedWithRsa[i+aesParameters.length] = messageLength[i];
             }
-
 
             Cipher rsaCipher = Cipher.getInstance("RSA");
             rsaCipher.init(Cipher.ENCRYPT_MODE, this.publicKey);
