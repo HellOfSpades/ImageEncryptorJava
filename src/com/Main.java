@@ -1,24 +1,11 @@
 package com;
 
-import com.encryption.BitMapImageEncryptor;
-import com.encryption.ImageEncryptor;
-import com.encryption.PPKeyImageEncryptor;
-import com.encryption.PPKeyImageEncryptorBitMapWrapper;
-import com.encryption.image_encoder.ImageEncoder;
-import com.encryption.image_encoder.PerColourEncoder;
-import com.encryption.image_encoder.TooManyBitsException;
-import com.encryption.imagebitmap.ImageBitMap;
+import com.encryption.imagebitmap.ImagePixels;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 
 public class Main {
 
@@ -26,10 +13,10 @@ public class Main {
 
         //try {
         BufferedImage baseImage = ImageIO.read(new File(Constants.INPUT_FILE_PATH));
-        ImageBitMap imageBitMap = new ImageBitMap(baseImage);
+        ImagePixels imageBitMap = new ImagePixels(baseImage);
 
         int[][] pixels = imageBitMap.getPixels();
-        ImageBitMap pixelsBitMap = new ImageBitMap(pixels);
+        ImagePixels pixelsBitMap = new ImagePixels(pixels);
         BufferedImage restoredImage = pixelsBitMap.getImage();
 
         boolean same = true;

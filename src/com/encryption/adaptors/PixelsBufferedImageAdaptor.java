@@ -2,8 +2,8 @@ package com.encryption.adaptors;
 
 import java.awt.image.BufferedImage;
 
-public class BitMapBufferedImageAdaptor {
-    public static BufferedImage bitMapToBufferedImage(int[][] pixels){
+public class PixelsBufferedImageAdaptor {
+    public static BufferedImage pixelsToBufferedImage(int[][] pixels){
         BufferedImage image = new BufferedImage(pixels[0].length, pixels.length, BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < pixels.length; i++) {
             for (int n = 0; n < pixels[i].length; n++) {
@@ -13,7 +13,7 @@ public class BitMapBufferedImageAdaptor {
         return image;
     }
 
-    public static int[][] bufferedImageToBitMap(BufferedImage image){
+    public static int[][] bufferedImageToPixels(BufferedImage image){
         int[][] pixels = new int[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int n = 0; n < image.getWidth(); n++) {

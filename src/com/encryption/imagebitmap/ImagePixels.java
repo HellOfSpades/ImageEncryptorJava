@@ -1,6 +1,6 @@
 package com.encryption.imagebitmap;
 
-import com.encryption.adaptors.BitMapBufferedImageAdaptor;
+import com.encryption.adaptors.PixelsBufferedImageAdaptor;
 
 import java.awt.image.BufferedImage;
 
@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
  * it converts between Androids BitMap colors per pixel to java BufferedImage
  * and vice versa
  */
-public class ImageBitMap{
+public class ImagePixels {
 
     private BufferedImage image;
     //[y][x]
@@ -17,10 +17,10 @@ public class ImageBitMap{
     private int[][] pixels;
 
     //constructors take either pixels or the image
-    public ImageBitMap(int[][] pixels){
+    public ImagePixels(int[][] pixels){
         this.pixels = pixels;
     }
-    public ImageBitMap(BufferedImage image){
+    public ImagePixels(BufferedImage image){
         this.image = image;
     }
 
@@ -46,12 +46,12 @@ public class ImageBitMap{
      * initializes the image from pixels
      */
     private void initializeImage(){
-        image = BitMapBufferedImageAdaptor.bitMapToBufferedImage(pixels);
+        image = PixelsBufferedImageAdaptor.pixelsToBufferedImage(pixels);
     }
     /**
      * initializes pixels from the image
      */
     private void initializePixels(){
-        pixels = BitMapBufferedImageAdaptor.bufferedImageToBitMap(image);
+        pixels = PixelsBufferedImageAdaptor.bufferedImageToPixels(image);
     }
 }
