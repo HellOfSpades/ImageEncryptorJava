@@ -239,7 +239,6 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
         }
 
         public AesEncryptor(byte[] parameters){
-            //TODO implement this
             byte[] keyBytes = new byte[32];
             byte[] ivBytes = new byte[16];
             for (int i = 0; i < keyBytes.length; i++) {
@@ -274,7 +273,6 @@ public class PPKeyImageEncryptor implements ImageEncryptor{
         }
 
         public byte[] decrypt(byte[] bytes){
-            //TODO make the method decrypt the input
             try{
                 Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
                 aesCipher.init(Cipher.DECRYPT_MODE, key,iv);
